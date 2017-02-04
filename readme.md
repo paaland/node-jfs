@@ -26,10 +26,10 @@ Create the file config.json and insert your username and password:
 Syntax
 -------------
 
-* Listing account info and devices:
+**Listing account info and devices:**
 
-node jsf --account
+    node jsf --account
 
-* Listing content
+**Listing content**
 
-node jsf --ls Device/MountPoint/Folder
+    node jsf --ls Device/MountPoint/Folder
