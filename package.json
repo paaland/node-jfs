@@ -1,0 +1,17 @@
+{
+  "name": "node-jfs",
+  "version": "1.0.0",
+  "description": "Jottacloud File System (JFS) client in NodeJS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "elementtree": "^0.1.7",
+    "pretty-bytes": "^4.0.2",
+    "request": "^2.79.0",
+    "yargs": "^6.6.0"
+  }
+}
