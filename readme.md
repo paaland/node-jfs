@@ -30,8 +30,8 @@ Syntax
 
     --ls                            list all devices (if you have more than one)
     --ls device                     list all mount points on device
-    --ls device/monthpoint          list all folders and files in monthpoint
-    --ls device/monthpoint/folder   list all folders and files in folder
+    --ls device/mountpoint          list all folders and files in mount point
+    --ls device/mountpoint/folder   list all folders and files in folder
 
 **Downloading a file**
 
