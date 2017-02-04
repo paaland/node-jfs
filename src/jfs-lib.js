@@ -6,6 +6,7 @@ var device = require('./device.js');
 var mountpoint = require('./mountpoint.js');
 var folder = require('./folder.js');
 var querystring = require('querystring');
+var md5 = require('md5');
 
 var config = {};
 
@@ -79,5 +80,37 @@ module.exports = {
                 console.log(response.headers['content-type']) // 'image/png'
             })
             .pipe(fs.createWriteStream(target));
+    },
+    putFile: function (remotePath, localFile) {
+        var target = localFile.substring(localFile.lastIndexOf('/')+1).replace(/((\?|#).*)?$/,'');        
+        var url = 'https://up.jottacloud.com/jfs/' + config.username + '/' + remotePath + '/' + target + '?umode=nomultipart';
+
+        console.log(target);
+        console.log(url);
+
+        var stats = fs.statSync(localFile);
+        fs.readFile(localFile, function(err, buf) {
+            var md5hash = md5(buf);
+       
+            var options = {
+                url: url,
+                headers: {
+                    'JMd5': md5hash,
+                    'JCreated': stats.ctime,
+                    'JModified': stats.mtime,
+                    'JSize': buf.length
+                }
+            };
+
+            fs.createReadStream(localFile)
+                .pipe(request.post(options))
+                .auth(config.username, config.password, true)
+                .on('error', function(err) {
+                    console.error(err)
+                })
+                .on('response', function(response) {
+                    console.log(response.statusCode) // 200
+                });
+        });
     }
 }

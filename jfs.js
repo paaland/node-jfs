@@ -10,8 +10,8 @@ if (argv.account) {
 else if (argv.ls) {
     jfs.list(argv.ls);
 }
-else if (argv.get) {
-    jfs.getFile(argv.get);
+else if (argv.put && argv.file) {
+    jfs.putFile(argv.put, argv.file);
 }
 else
 {
@@ -19,4 +19,5 @@ else
     console.log('   jfs --account');
     console.log('   jfs --ls <device>/path');
     console.log('   jfs --get <device>/path/file');
+    console.log('   jfs --put <device>/path/file --file <localfile>');
 }
