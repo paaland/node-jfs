@@ -54,5 +54,7 @@ The device "Jotta" is reserved for the Jotta functionality. Under Jotta you will
  
 Limitations
 ==============
-* Note that JottaCloud is officially only for Windows. This means that file names and paths are not case sensitive. So README and readme will be the same file.
-* To download files or list files in folders that has a space either encapsulete in quotes or use a + character ("device/Home Videos" or device/Home+Videos)
+* Note that JottaCloud is officially only for Windows. This means that file names and paths are not case sensitive. 
+So README and readme will be the same file.
+* To download files or list files in folders that has a space either encapsulete in quotes or use a + character 
+("device/Home Videos" or device/Home+Videos)
