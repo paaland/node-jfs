@@ -10,6 +10,9 @@ if (argv.account) {
 else if (argv.ls) {
     jfs.list(argv.ls);
 }
+else if (argv.get) {
+    jfs.getFile(argv.get);
+}
 else
 {
     console.log('Usage: ');

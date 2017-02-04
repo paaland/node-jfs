@@ -1,10 +1,11 @@
 var request = require('request');
 var et = require('elementtree');
-var  prettyBytes = require('pretty-bytes');
-
+var fs = require('fs');
+var prettyBytes = require('pretty-bytes');
 var device = require('./device.js');
 var mountpoint = require('./mountpoint.js');
 var folder = require('./folder.js');
+var querystring = require('querystring');
 
 var config = {};
 
@@ -59,5 +60,24 @@ module.exports = {
                     console.log('');
                 });
             }).auth(config.username, config.password, true);
+    },
+    getFile : function (path) {
+        var url = 'https://down.jottacloud.com/jfs/' + config.username + '/' + querystring.escape(path) + '?revision=1&mode=bin';
+        var target = path.substring(path.lastIndexOf('/')+1).replace(/((\?|#).*)?$/,'');
+        
+        console.log('Downloading: ' + path);
+        console.log('Saving to: ' + target);
+
+        request
+            .get(url)
+            .auth(config.username, config.password, true)
+            .on('error', function(err) {
+                console.error(err)
+            })
+            .on('response', function(response) {
+                console.log(response.statusCode) // 200
+                console.log(response.headers['content-type']) // 'image/png'
+            })
+            .pipe(fs.createWriteStream(target));
     }
 }

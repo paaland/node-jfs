@@ -33,3 +33,7 @@ Syntax
 **Listing content**
 
     node jsf --ls Device/MountPoint/Folder
+
+**Downloading a file**
+
+    node jsf --get Device/MountPoint/Folder/File
