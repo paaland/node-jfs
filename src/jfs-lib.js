@@ -15,7 +15,15 @@ module.exports = {
         config = settings;
     },
     list: function (path) {
-        request.get('https://www.jottacloud.com/jfs/' + config.username + '/' + path, 
+        var url = 'https://www.jottacloud.com/jfs/' + config.username + '/' + path;
+        var options = {
+            url: url,
+            headers: {
+                'User-Agent': 'node-jfs https://github.com/paaland/node-jfs'
+            }
+        };
+
+        request.get(options, 
             function (error, response, body) {
                 if (error) {
                     console.error(error);
@@ -40,7 +48,15 @@ module.exports = {
     },
     getAccount : function ()
     {
-        request.get('https://www.jottacloud.com/jfs/' + config.username, 
+        var url = 'https://www.jottacloud.com/jfs/' + config.username;
+        var options = {
+            url: url,
+            headers: {
+                'User-Agent': 'node-jfs https://github.com/paaland/node-jfs'
+            }
+        };
+
+        request.get(options, 
             function (error, response, body) {
                 if (error) {
                     console.error(error);
@@ -69,8 +85,15 @@ module.exports = {
         console.log('Downloading: ' + path);
         console.log('Saving to: ' + target);
 
+        var options = {
+            url: url,
+            headers: {
+                'User-Agent': 'node-jfs https://github.com/paaland/node-jfs'
+            }
+        };
+
         request
-            .get(url)
+            .get(options)
             .auth(config.username, config.password, true)
             .on('error', function(err) {
                 console.error(err)
@@ -95,6 +118,7 @@ module.exports = {
             var options = {
                 url: url,
                 headers: {
+                    'User-Agent': 'node-jfs https://github.com/paaland/node-jfs',
                     'JMd5': md5hash,
                     'JCreated': stats.ctime,
                     'JModified': stats.mtime,
