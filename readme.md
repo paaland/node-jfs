@@ -26,7 +26,7 @@ Syntax
 -------------
 **Listing content**
 
-    node jsf --ls [Device/MountPoint/Folder]
+    node jsf.js --ls [Device/MountPoint/Folder]
 
     --ls                            list all devices (if you have more than one)
     --ls device                     list all mount points on device
@@ -35,11 +35,11 @@ Syntax
 
 **Downloading a file**
 
-    node jsf --get Device/MountPoint/Folder/File
+    node jsf.js --get Device/MountPoint/Folder/File
 
 **Upload a file**
 
-    node jsf --put Device/MountPoint/Folder --file LocalFile.ext
+    node jsf.js --put Device/MountPoint/Folder --file LocalFile.ext
 
 Note that for now the device (first part of path) must already exist.
 
@@ -52,3 +52,7 @@ The device "Jotta" is reserved for the Jotta functionality. Under Jotta you will
     Jotta/Backup  -> This is the mount point for backup of devices
     Jotta/Archive -> This is the mount point for archived files
  
+Limitations
+==============
+* Note that JottaCloud is officially only for Windows. This means that file names and paths are not case sensitive. So README and readme will be the same file.
+* To download files or list files in folders that has a space either encapsulete in quotes or use a + character ("device/Home Videos" or device/Home+Videos)
