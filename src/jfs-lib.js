@@ -46,6 +46,7 @@ module.exports = {
 
             }).auth(config.username, config.password, true);
     },
+    
     getAccount : function ()
     {
         var url = 'https://www.jottacloud.com/jfs/' + config.username;
@@ -78,6 +79,7 @@ module.exports = {
                 });
             }).auth(config.username, config.password, true);
     },
+
     getFile : function (path) {
         var url = 'https://down.jottacloud.com/jfs/' + config.username + '/' + querystring.escape(path) + '?revision=1&mode=bin';
         var target = path.substring(path.lastIndexOf('/')+1).replace(/((\?|#).*)?$/,'');
@@ -100,19 +102,19 @@ module.exports = {
             })
             .on('response', function(response) {
                 console.log(response.statusCode) // 200
-                console.log(response.headers['content-type']) // 'image/png'
             })
             .pipe(fs.createWriteStream(target));
     },
+    
     putFile: function (remotePath, localFile) {
         var target = localFile.substring(localFile.lastIndexOf('/')+1).replace(/((\?|#).*)?$/,'');        
         var url = 'https://up.jottacloud.com/jfs/' + config.username + '/' + remotePath + '/' + target + '?umode=nomultipart';
 
-        console.log(target);
-        console.log(url);
-
         var stats = fs.statSync(localFile);
         fs.readFile(localFile, function(err, buf) {
+            
+            console.log('Uploading ' + target + ' ' + buf.length + ' bytes');
+
             var md5hash = md5(buf);
        
             var options = {
