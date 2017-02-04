@@ -45,7 +45,6 @@ Note that for now the device (first part of path) must already exist.
 The first part of the path is called a device. Weather you can have multiple devies depends on your account type. Unlimited accounts can have unlimieted devices.
 The device "Jotta" is reserved for the Jotta functionality. Under Jotta you will find "Sync", "Backup" and "Archive" which are reserved mount points.
 
-   Jotta/Sync    -> This is where your sync folder resides
-   Jotta/Backup  -> This is the mount point for backup of devices
-   Jotta/Archive -> This is the mount point for archived files
-   
+    Jotta/Sync    -> This is where your sync folder resides
+    Jotta/Backup  -> This is the mount point for backup of devices
+    Jotta/Archive -> This is the mount point for archived files
