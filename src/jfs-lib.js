@@ -10,6 +10,15 @@ var md5 = require('md5');
 
 var config = {};
 
+function minLength(text, minLen) {
+    while (text.length < minLen)
+    {
+        text = text + ' ';
+    }
+
+    return text;
+}
+
 module.exports = {
     setConfig : function (settings) {
         config = settings;
@@ -47,7 +56,7 @@ module.exports = {
             }).auth(config.username, config.password, true);
     },
     
-    getAccount : function ()
+    listDevices : function ()
     {
         var url = 'https://www.jottacloud.com/jfs/' + config.username;
         var options = {
@@ -65,17 +74,11 @@ module.exports = {
                 }
 
                 var user = et.parse(body);
-                console.log('Username: ' + user.findtext('username'));
-                console.log('Account-Type: ' + user.findtext('account-type'));
-                console.log('Devices: ');
-
                 var devices = user.findall('devices/device');
 
+                console.log(minLength('Type', 12) + '\t' + minLength('Size', 10) + '\tName');
                 devices.forEach(function(device) {
-                    console.log('   Name: ' + device.findtext('name'));
-                    console.log('   Type: ' + device.findtext('type'));
-                    console.log('   Size: ' + prettyBytes(parseInt(device.findtext('size'), 10)));
-                    console.log('');
+                    console.log(minLength(device.findtext('type'),12) + '\t' + minLength(prettyBytes(parseInt(device.findtext('size'), 10)), 10) + '\t' + device.findtext('name'));
                 });
             }).auth(config.username, config.password, true);
     },

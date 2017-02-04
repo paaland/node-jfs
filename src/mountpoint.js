@@ -3,11 +3,7 @@ var et = require('elementtree');
 var  prettyBytes = require('pretty-bytes');
 
 module.exports = {    
-    list: function (mountPoint) {
-        console.log('Name: ' + mountPoint.findtext('name'));
-        console.log('Size: ' + prettyBytes(parseInt(mountPoint.findtext('size'), 10)));
-        console.log('');
-
+    list: function (mountPoint) {        
         var folders = mountPoint.findall('folders/folder');
 
         folders.forEach(function(folder) {
