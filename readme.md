@@ -1,6 +1,18 @@
 Jotta File System (JFS)for nodejs 
 ==============
 
+Install
+--------------
+
+Install nodejs and npm (node package manager).
+Download the code, easiest is to use git and simply clone this repository.
+
+    git clone https://github.com/paaland/node-jfs 
+
+Then download the required dependencies:
+
+    npm install 
+
 Configure
 --------------
 
