@@ -9,6 +9,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "dateformat": "^2.0.0",
     "elementtree": "^0.1.7",
     "md5": "^2.2.1",
     "pretty-bytes": "^4.0.2",

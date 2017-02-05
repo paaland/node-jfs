@@ -5,8 +5,8 @@ var prettyBytes = require('pretty-bytes');
 var device = require('./device.js');
 var mountpoint = require('./mountpoint.js');
 var folder = require('./folder.js');
+var uploader = require('./jfsuploader.js');
 var querystring = require('querystring');
-var md5 = require('md5');
 
 var config = {};
 
@@ -55,7 +55,6 @@ module.exports = {
 
             }).auth(config.username, config.password, true);
     },
-    
     listDevices : function ()
     {
         var url = 'https://www.jottacloud.com/jfs/' + config.username;
@@ -82,9 +81,8 @@ module.exports = {
                 });
             }).auth(config.username, config.password, true);
     },
-
     getFile : function (path) {
-        var url = 'https://down.jottacloud.com/jfs/' + config.username + '/' + querystring.escape(path) + '?revision=1&mode=bin';
+        var url = 'https://down.jottacloud.com/jfs/' + config.username + '/' + querystring.escape(path) + '?mode=bin';
         var target = path.substring(path.lastIndexOf('/')+1).replace(/((\?|#).*)?$/,'');
         
         console.log('Downloading: ' + path);
@@ -108,38 +106,10 @@ module.exports = {
             })
             .pipe(fs.createWriteStream(target));
     },
-    
     putFile: function (remotePath, localFile) {
-        var target = localFile.substring(localFile.lastIndexOf('/')+1).replace(/((\?|#).*)?$/,'');        
-        var url = 'https://up.jottacloud.com/jfs/' + config.username + '/' + remotePath + '/' + target + '?umode=nomultipart';
-
-        var stats = fs.statSync(localFile);
-        fs.readFile(localFile, function(err, buf) {
-            
-            console.log('Uploading ' + target + ' ' + buf.length + ' bytes');
-
-            var md5hash = md5(buf);
-       
-            var options = {
-                url: url,
-                headers: {
-                    'User-Agent': 'node-jfs https://github.com/paaland/node-jfs',
-                    'JMd5': md5hash,
-                    'JCreated': stats.ctime,
-                    'JModified': stats.mtime,
-                    'JSize': buf.length
-                }
-            };
-
-            fs.createReadStream(localFile)
-                .pipe(request.post(options))
-                .auth(config.username, config.password, true)
-                .on('error', function(err) {
-                    console.error(err)
-                })
-                .on('response', function(response) {
-                    console.log(response.statusCode) // 200
-                });
-        });
+        uploader.uploadFile(config, remotePath, localFile);
+    },
+    putFolder: function (remotePath, localFolder) {
+        uploader.uploadFolder(config, remotePath, localFolder);
     }
 }
