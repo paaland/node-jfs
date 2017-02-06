@@ -9,6 +9,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "async": "^2.1.4",
+    "async.eachlimit": "^0.5.2",
     "dateformat": "^2.0.0",
     "elementtree": "^0.1.7",
     "md5": "^2.2.1",
