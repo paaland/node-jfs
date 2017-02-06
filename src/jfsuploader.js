@@ -101,7 +101,10 @@ function uploadFile(config, remotePath, localFile, callback)
             } else if (status === 404) {
                 //File not already on remote, upload file
                 uploadFileToRemote(config, remotePath, localFile, md5hash, function (status) {
-                    console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') + ': File "' + localFile + '" uploaded, response ' + status); 
+                    if (!status || (status !== 200 && status !== 201)) {
+                        console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') + ': ERROR: Failed to upload "' + localFile + '", response ' + status); 
+                    }
+                    
                     if (callback)
                         callback();                       
                 });
@@ -122,7 +125,7 @@ function uploadFileToRemote(config, remotePath, localFile, md5hash, callback)
     var fileName = path.basename(localFile);
     var stats = fs.statSync(localFile);        
     var options = {
-        url: 'https://up.jottacloud.com/jfs/' + config.username + '/' + remotePath + '/' + fileName + '?umode=nomultipart',
+        url: 'https://up.jottacloud.com/jfs/' + config.username + '/' + remotePath + '/' +  querystring.escape(fileName) + '?umode=nomultipart',
         headers: {
             'User-Agent': 'node-jfs https://github.com/paaland/node-jfs',
             'JMd5': md5hash,
@@ -152,7 +155,7 @@ function checkIfFileExists(config, remotePath, localFile, md5hash, callback)
     var fileName = path.basename(localFile);
     var stats = fs.statSync(localFile);        
     var options = {
-        url: 'https://jfs.jottacloud.com/jfs/' + config.username + '/' + remotePath + '/' + fileName + '?cphash=' + md5hash,
+        url: 'https://jfs.jottacloud.com/jfs/' + config.username + '/' + remotePath + '/' + querystring.escape(fileName) + '?cphash=' + md5hash,
         headers: {
             'User-Agent': 'node-jfs https://github.com/paaland/node-jfs',
             'JMd5': md5hash,
