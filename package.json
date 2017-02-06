@@ -14,10 +14,9 @@
   "license": "MIT",
   "dependencies": {
     "async": "^2.1.4",
-    "async.eachlimit": "^0.5.2",
+    "async.eachlimit": "^0.5.2",    
     "dateformat": "^2.0.0",
-    "elementtree": "^0.1.7",
-    "md5": "^2.2.1",
+    "elementtree": "^0.1.7",    
     "pretty-bytes": "^4.0.2",
     "querystring": "^0.2.0",
     "request": "^2.79.0",
