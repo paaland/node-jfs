@@ -48,11 +48,11 @@ function uploadFolder (config, remotePath, localFolder) {
     console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': Scanning ' + localFolder);
     var files = getAllFilesInFolder(localFolder);
 
-    files.forEach(function(element) {
-        console.log(element);
-    }, this);
+    // files.forEach(function(element) {
+    //     console.log(element);
+    // }, this);
 
-    return;
+    // return;
 
     console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': Uploading ' + files.length + ' files');
 
