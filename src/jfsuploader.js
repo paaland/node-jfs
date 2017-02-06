@@ -20,7 +20,11 @@ function getAllFilesInFolder(dir) {
     var results = [];
 
     fs.readdirSync(dir).forEach(function(file) {
-        file = dir + path.sep + file;
+        if (dir.slice(-1) !== path.sep)
+            file = dir + path.sep + file;
+        else
+            file = dir + file;
+
         var stat = undefined;;
         try
         {
@@ -43,6 +47,12 @@ function getAllFilesInFolder(dir) {
 function uploadFolder (config, remotePath, localFolder) {
     console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': Scanning ' + localFolder);
     var files = getAllFilesInFolder(localFolder);
+
+    files.forEach(function(element) {
+        console.log(element);
+    }, this);
+
+    return;
 
     console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': Uploading ' + files.length + ' files');
 
@@ -69,17 +79,6 @@ function uploadFolder (config, remotePath, localFolder) {
     function error(err) {
         console.error(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': ERROR: ' + err);
     });
-
-    // files.forEach(function(file) {
-    //     var fileName = path.basename(file);
-    //     var folder = path.dirname(file);
-        
-    //     //Remove initial path, convert to web url
-    //     folder = folder.replace(localFolder, '');
-    //     folder = folder.replace('\\', '/');
-        
-    //     this.uploadFile(config, remotePath + folder, file);
-    // }, this);
 }
     
 function uploadFile(config, remotePath, localFile, callback)
