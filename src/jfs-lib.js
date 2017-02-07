@@ -81,7 +81,7 @@ function listDevices () {
 }
 
 function list(path) {
-    var url = 'https://www.jottacloud.com/jfs/' + config.username + '/' + path;
+    var url = 'https://www.jottacloud.com/jfs/' + config.username + '/' + encodeURI(path);
     var options = {
         url: url,
         headers: {

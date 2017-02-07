@@ -47,12 +47,6 @@ function uploadFolder (config, remotePath, localFolder) {
     console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': Scanning ' + localFolder);
     var files = getAllFilesInFolder(localFolder);
 
-    // files.forEach(function(element) {
-    //     console.log(element);
-    // }, this);
-
-    // return;
-
     console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': Uploading ' + files.length + ' files');
 
     async.eachLimit(files, 4, function(file, done) {
@@ -76,7 +70,8 @@ function uploadFolder (config, remotePath, localFolder) {
         }
     },
     function error(err) {
-        console.error(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': ERROR: ' + err);
+        if (err)
+            console.error(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': ERROR: ' + err);
     });
 }
     
@@ -164,7 +159,7 @@ function checkIfFileExists(config, remotePath, localFile, md5hash, callback)
     };
     
     //Check if file with same name, size, md5hash, modified date and created date exists
-    request.post(options, function (error, response, body) {
+    request.post(options, function (error, response, body) {        
          if (!error && response.statusCode == 200) {
              if (fileIsComplete(body))
                 callback(response.statusCode);
@@ -180,7 +175,12 @@ function fileIsComplete(body)
 {
     var file = et.parse(body);
     var state = file.findtext('latestRevision/state');
+    if (!state)
+        state = file.findtext('currentRevision/state');
     
+    // console.log('Body: ' + body);
+    // console.log('Check: ' + state);
+
     return state === 'COMPLETED';
 }
         
