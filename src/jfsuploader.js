@@ -55,14 +55,14 @@ function getAllFilesInFolder(dir, ignore) {
 
 function uploadFolder (config, remotePath, localFolder, ignore) {
     console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': Scanning ' + localFolder);
-    if (ignore)
-        console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': Ignoring files matching ' + ignore);
+    if (ignore[0])
+        console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': Ignoring files matching: ' + ignore);
     
     var files = getAllFilesInFolder(localFolder, ignore);
 
     console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': Uploading ' + files.length + ' files');
 
-    async.eachLimit(files, 4, function(file, done) {
+    async.eachLimit(files, 1, function(file, done) {
         var fileName = path.basename(file);
         var folder = path.dirname(file);
         
@@ -141,19 +141,29 @@ function uploadFileToRemote(config, remotePath, localFile, md5hash, callback)
         }
     };
 
-    console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') + ': Uploading "' +  localFile + '", ' + prettyBytes(stats.size));
-        
+    //console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') + ': Uploading "' +  localFile + '", ' + prettyBytes(stats.size));
+    
+    var start = new Date();    
+    
     //Upload file
     fs.createReadStream(localFile)
-        .pipe(request.post(options))
-        .auth(config.username, config.password, true)
-        .on('error', function(error) {
-            console.error(error)
-            callback(error.statusCode);                        
-        })
-        .on('response', function(response) {
-            callback(response.statusCode);
-        });
+        .pipe(req = request.post(options)
+            .auth(config.username, config.password, true)
+            .on('error', function(error) {
+                console.error(error)
+                callback(error.statusCode);                        
+            })
+            .on('drain', () => {                
+                var time = new Date()-start;
+                var mins = time / (1000*60);
+                var bps = req.req.connection.bytesWritten / mins;
+                process.stdout.write('\r' + dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') + ': Uploading "' +  localFile + '", ' + prettyBytes(req.req.connection.bytesWritten)  + ' of ' + prettyBytes(stats.size) + ' uploaded (' + prettyBytes(bps) + '/min)     ');
+            })
+            .on('response', function(response) {
+                process.stdout.write('\n');
+                callback(response.statusCode);
+            })
+        );
 }
 
 function checkIfFileExists(config, remotePath, localFile, md5hash, callback)
