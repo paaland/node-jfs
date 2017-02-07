@@ -2,6 +2,11 @@ JottaCloud File System (JFS) client in nodejs
 ==============
 This will eventually be a client for backup up local files to JottaCloud a fast, reliable and cheap cloud storage solution based in Norway. It's written in NodeJS and should work on most all OS and even devices like NAS. As Jotta hsa not released any official API or documentation this client is entierly created by examining the requests the official client does then figuring out how to recreate them.      
 
+Requirements
+--------------
+    NodeJS (required), https://nodejs.org
+    git (optional, but recomended), https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
+    
 Install
 --------------
 Install nodejs and npm (node package manager).
@@ -12,6 +17,12 @@ Download the code, easiest is to use git and simply clone this repository.
 Then download the required dependencies:
 
     npm install 
+
+Update
+-------------
+To update if you used git simply do a git pull from within the node-jfs folder you previously cloned.
+
+    git pull
 
 Configure
 --------------
