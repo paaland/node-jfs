@@ -4,7 +4,7 @@ var  prettyBytes = require('pretty-bytes');
 
 module.exports = {    
     list: function (folder) {
-        
+        console.log('');        
         var folders = folder.findall('folders/folder');
 
         folders.forEach(function(folder) {

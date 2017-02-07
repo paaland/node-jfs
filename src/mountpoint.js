@@ -5,6 +5,7 @@ var  prettyBytes = require('pretty-bytes');
 module.exports = {    
     list: function (mountPoint) {        
         var folders = mountPoint.findall('folders/folder');
+        console.log('');
 
         folders.forEach(function(folder) {
             if (!folder.get('deleted'))

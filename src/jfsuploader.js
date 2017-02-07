@@ -88,7 +88,7 @@ function uploadFile(config, remotePath, localFile, callback)
         
         checkIfFileExists(config, remotePath, localFile, md5hash, function (status) {
             if (status === 200) {
-                console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': File already exists, skipping.');
+                console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': File "' + localFile + '" already exists, skipping.');
                 if (callback)
                     callback();
             } else if (status === 404) {
