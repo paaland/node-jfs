@@ -45,9 +45,9 @@ Note that for now the device (first part of path) must already exist.
 
 **Upload a folder**
 
-    node jsf.js --put Device/MountPoint/Folder --folder LocalPath
+    node jsf.js --put Device/MountPoint/Folder --folder LocalPath --ignore .tmp --ignore temp 
 
-This will scan all files (and folders) in LocalPath and upload any new or changed files.
+This will scan all files (and folders) in LocalPath and upload any new or changed files. Ignoring any files containing ignore strings in name.
 
 Devices and mount points
 =============
