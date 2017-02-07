@@ -1,6 +1,5 @@
 var request = require('request');
 var fs = require('fs');
-var querystring = require('querystring');
 var dateformat = require('dateformat');
 var async = require('async');
 var crypto = require('crypto');
@@ -124,7 +123,7 @@ function uploadFileToRemote(config, remotePath, localFile, md5hash, callback)
     var fileName = path.basename(localFile);
     var stats = fs.statSync(localFile);        
     var options = {
-        url: 'https://up.jottacloud.com/jfs/' + config.username + '/' + remotePath + '/' +  querystring.escape(fileName) + '?umode=nomultipart',
+        url: 'https://up.jottacloud.com/jfs/' + encodeURI(config.username + '/' + remotePath + '/' +  fileName) + '?umode=nomultipart',
         headers: {
             'User-Agent': 'node-jfs https://github.com/paaland/node-jfs',
             'JMd5': md5hash,
@@ -154,7 +153,7 @@ function checkIfFileExists(config, remotePath, localFile, md5hash, callback)
     var fileName = path.basename(localFile);
     var stats = fs.statSync(localFile);        
     var options = {
-        url: 'https://jfs.jottacloud.com/jfs/' + config.username + '/' + remotePath + '/' + querystring.escape(fileName) + '?cphash=' + md5hash,
+        url: 'https://jfs.jottacloud.com/jfs/' + encodeURI(config.username + '/' + remotePath + '/' +fileName) + '?cphash=' + md5hash,
         headers: {
             'User-Agent': 'node-jfs https://github.com/paaland/node-jfs',
             'JMd5': md5hash,

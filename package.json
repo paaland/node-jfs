@@ -17,8 +17,7 @@
     "async.eachlimit": "^0.5.2",    
     "dateformat": "^2.0.0",
     "elementtree": "^0.1.7",    
-    "pretty-bytes": "^4.0.2",
-    "querystring": "^0.2.0",
+    "pretty-bytes": "^4.0.2",    
     "request": "^2.79.0",
     "yargs": "^6.6.0"
   }

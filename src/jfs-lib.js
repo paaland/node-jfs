@@ -6,7 +6,6 @@ var device = require('./device.js');
 var mountpoint = require('./mountpoint.js');
 var folder = require('./folder.js');
 var uploader = require('./jfsuploader.js');
-var querystring = require('querystring');
 
 var config = {};
 
@@ -30,7 +29,7 @@ function putFile (remotePath, localFile) {
 }
 
 function getFile(path) {
-    var url = 'https://down.jottacloud.com/jfs/' + config.username + '/' + querystring.escape(path) + '?mode=bin';
+    var url = 'https://down.jottacloud.com/jfs/' + config.username + '/' + encodeURI(path) + '?mode=bin';
     var target = path.substring(path.lastIndexOf('/')+1).replace(/((\?|#).*)?$/,'');
     
     console.log('Downloading: ' + path);
