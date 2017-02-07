@@ -20,8 +20,8 @@ module.exports = {
     putFolder: putFolder
 }
 
-function putFolder(remotePath, localFolder) {
-    uploader.uploadFolder(config, remotePath, localFolder);
+function putFolder(remotePath, localFolder, ignore) {
+    uploader.uploadFolder(config, remotePath, localFolder, ignore);
 }
 
 function putFile (remotePath, localFile) {

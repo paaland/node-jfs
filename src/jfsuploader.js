@@ -15,7 +15,7 @@ module.exports = {
     uploadFile: uploadFile
 };
 
-function getAllFilesInFolder(dir) {
+function getAllFilesInFolder(dir, ignore) {
     var results = [];
 
     fs.readdirSync(dir).forEach(function(file) {
@@ -34,18 +34,31 @@ function getAllFilesInFolder(dir) {
         }
         if (stat) {
             if (stat.isDirectory()) 
-                results = results.concat(getAllFilesInFolder(file))
+                results = results.concat(getAllFilesInFolder(file, ignore))
             else 
-                results.push(file);
+            {
+                var ignoreFile = false;
+                ignore.forEach(function(element) {
+                    if (file.indexOf(element) > -1) {
+                        ignoreFile = true;
+                    }
+                }, this);
+                
+                if (!ignoreFile)
+                    results.push(file);
+            }
         } 
     });
 
     return results;
 };
 
-function uploadFolder (config, remotePath, localFolder) {
+function uploadFolder (config, remotePath, localFolder, ignore) {
     console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': Scanning ' + localFolder);
-    var files = getAllFilesInFolder(localFolder);
+    if (ignore)
+        console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': Ignoring files matching ' + ignore);
+    
+    var files = getAllFilesInFolder(localFolder, ignore);
 
     console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': Uploading ' + files.length + ' files');
 
