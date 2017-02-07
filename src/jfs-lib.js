@@ -21,6 +21,8 @@ module.exports = {
 }
 
 function putFolder(remotePath, localFolder, ignore) {
+    if (!Array.isArray(ignore))
+        ignore = Array(ignore);
     uploader.uploadFolder(config, remotePath, localFolder, ignore);
 }
 
