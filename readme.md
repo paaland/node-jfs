@@ -60,6 +60,11 @@ Note that for now the device (first part of path) must already exist.
 
 This will scan all files (and folders) in LocalPath and upload any new or changed files. Ignoring any files containing ignore strings in name.
 
+Example
+
+    node jsf.js --put MyComputer/Backup/Pictures --folder "c:\Users\paaland\Documents\My Pictures" --ignore .tmp --ignore temp --ignore .thumb 2\> Backup.%date%.errors.log
+
+
 Devices and mount points
 =============
 The first part of the path is called a device. Weather you can have multiple devies depends on your account type. Unlimited accounts can have unlimieted devices.
