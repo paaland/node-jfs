@@ -62,8 +62,10 @@ This will scan all files (and folders) in LocalPath and upload any new or change
 
 Example
 
-    node jsf.js --put MyComputer/Backup/Pictures --folder "c:\Users\paaland\Documents\My Pictures" --ignore .tmp --ignore temp --ignore .thumb 2\> Backup.%date%.errors.log
+    node jsf.js --put MyComputer/Backup/Pictures --folder "c:\Users\paaland\Documents\My Pictures" --ignore .tmp --ignore temp --ignore .thumb 2> Backup.%date%.errors.log
 
+This will backup all content in c:\Users\paaland\Documents\My Pictures (except any files that has .tmp temp or .thump as part of their name) to Jotta device MyComputer, mount point Backup and folder Pictures.
+Any errors will be logged to Backup.08.02.2017.errors.log (date is example).
 
 Devices and mount points
 =============
