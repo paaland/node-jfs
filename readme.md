@@ -84,3 +84,8 @@ So README and readme will be the same file.
 ("device/Home Videos" or device/Home+Videos)
 * When uploading folders the client will calculate the MD5 hash for the file and query JottaCloud before uploading the file. Only new or changed files are uploaded.
 * This client cannot create new devices. You have to use an existing device when uploading to JottaCloud (first part of destination URL).
+
+API documentation
+==============
+This client has been made partially by observing what the official client does (by setting up a proxy) and the following "documentation":
+http://forum.jotta.no/jotta/topics/api_http
