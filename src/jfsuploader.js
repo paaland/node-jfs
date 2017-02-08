@@ -108,14 +108,14 @@ function uploadFile(config, remotePath, localFile, callback)
                 //File not already on remote, upload file
                 uploadFileToRemote(config, remotePath, localFile, md5hash, function (status) {
                     if (!status || (status !== 200 && status !== 201)) {
-                        console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') + ': ERROR: Failed to upload "' + localFile + '", response ' + status); 
+                        console.error(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') + ': ERROR: Failed to upload "' + localFile + '", response ' + status); 
                     }
                     
                     if (callback)
                         callback();                       
                 });
             } else {
-                console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': ERROR: Unknown status ' + status);
+                console.error(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': ERROR: Unknown status ' + status);
                 if (callback)
                     callback("Error");
             }
