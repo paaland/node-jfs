@@ -6,6 +6,7 @@ var crypto = require('crypto');
 var path = require('path');
 var prettyBytes = require('pretty-bytes');
 var et = require('elementtree');
+var jfsdb = require('./sqliteclient');
 
 //For debug, accept self signed ssl 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -62,6 +63,9 @@ function uploadFolder (config, remotePath, localFolder, ignore) {
 
     console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': Uploading ' + files.length + ' files');
 
+    //TODO:
+    //var filesInFolder = getRemoteFiles(remotePath);
+    
     async.eachLimit(files, 1, function(file, done) {
         var fileName = path.basename(file);
         var folder = path.dirname(file);
@@ -99,27 +103,40 @@ function uploadFile(config, remotePath, localFile, callback)
         hash.end();
         var md5hash = hash.read(); 
         
-        checkIfFileExists(config, remotePath, localFile, md5hash, function (status) {
-            if (status === 200) {
-                console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': File "' + localFile + '" already exists, skipping.');
-                if (callback)
+        if (jfsdb.isFileUploaded(localFile, md5hash)){
+            console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': File "' + localFile + '" previously uploaded, skipping.');
+            if (callback)
                     callback();
-            } else if (status === 404) {
-                //File not already on remote, upload file
-                uploadFileToRemote(config, remotePath, localFile, md5hash, function (status) {
-                    if (!status || (status !== 200 && status !== 201)) {
-                        console.error(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') + ': ERROR: Failed to upload "' + localFile + '", response ' + status); 
-                    }
+        }
+        else
+        {
+            checkIfFileExists(config, remotePath, localFile, md5hash, function (status) {
+                if (status === 200) {
+                    console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': File "' + localFile + '" already exists, skipping.');
+                    jfsdb.addUploadedFile(localFile, md5hash);
                     
                     if (callback)
-                        callback();                       
-                });
-            } else {
-                console.error(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': ERROR: Unknown status ' + status);
-                if (callback)
-                    callback("Error");
-            }
-        });
+                        callback();
+                } else if (status === 404) {
+                    //File not already on remote, upload file
+                    uploadFileToRemote(config, remotePath, localFile, md5hash, function (status) {
+                        if (!status || (status !== 200 && status !== 201)) {
+                            console.error(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') + ': ERROR: Failed to upload "' + localFile + '", response ' + status); 
+                        }
+                        else 
+                        {
+                            jfsdb.addUploadedFile(localFile, md5hash);
+                            if (callback)
+                                callback();                       
+                        }
+                    });
+                } else {
+                    console.error(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': ERROR: Unknown status ' + status);
+                    if (callback)
+                        callback("Error");
+                }
+            });
+        }
     });
 
     // read all file and pipe it (write it) to the hash object
@@ -153,14 +170,8 @@ function uploadFileToRemote(config, remotePath, localFile, md5hash, callback)
                 console.error(error)
                 callback(error.statusCode);                        
             })
-            .on('drain', () => {                
-                var time = new Date()-start;
-                var mins = time / (1000*60);
-                var bps = req.req.connection.bytesWritten / mins;
-                process.stdout.write('\r' + dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') + ': Uploading "' +  localFile + '", ' + prettyBytes(req.req.connection.bytesWritten)  + ' of ' + prettyBytes(stats.size) + ' uploaded (' + prettyBytes(bps) + '/min)     ');
-            })
             .on('response', function(response) {
-                process.stdout.write('\n');
+                console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') + ': Uploaded "' +  localFile + '"');
                 callback(response.statusCode);
             })
         );
