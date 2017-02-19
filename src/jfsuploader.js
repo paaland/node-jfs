@@ -8,6 +8,8 @@ var prettyBytes = require('pretty-bytes');
 var et = require('elementtree');
 var jfsdb = require('./sqliteclient');
 
+jfsdb.createDB();
+
 //For debug, accept self signed ssl 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
@@ -103,42 +105,43 @@ function uploadFile(config, remotePath, localFile, callback)
         hash.end();
         var md5hash = hash.read(); 
         
-        if (jfsdb.isFileUploaded(localFile, md5hash)){
-            console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': File "' + localFile + '" previously uploaded, skipping.');
-            if (callback)
+        jfsdb.isFileUploaded(localFile, md5hash, function (exists) {
+            if (exists === true) {
+                console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': File "' + localFile + '" previously uploaded, skipping.');
+                if (callback)
                     callback();
-        }
-        else
-        {
-            checkIfFileExists(config, remotePath, localFile, md5hash, function (status) {
-                if (status === 200) {
-                    console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': File "' + localFile + '" already exists, skipping.');
-                    jfsdb.addUploadedFile(localFile, md5hash);
-                    
-                    if (callback)
-                        callback();
-                } else if (status === 404) {
-                    //File not already on remote, upload file
-                    uploadFileToRemote(config, remotePath, localFile, md5hash, function (status) {
-                        if (!status || (status !== 200 && status !== 201)) {
-                            console.error(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') + ': ERROR: Failed to upload "' + localFile + '", response ' + status); 
-                        }
-                        else 
-                        {
-                            jfsdb.addUploadedFile(localFile, md5hash);
-                            if (callback)
-                                callback();                       
-                        }
-                    });
-                } else {
-                    console.error(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': ERROR: Unknown status ' + status);
-                    if (callback)
-                        callback("Error");
-                }
-            });
-        }
+            }
+            else
+            {
+                checkIfFileExists(config, remotePath, localFile, md5hash, function (status) {
+                    if (status === 200) {
+                        console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': File "' + localFile + '" already exists, skipping.');
+                        jfsdb.addUploadedFile(localFile, md5hash);
+                        
+                        if (callback)
+                            callback();
+                    } else if (status === 404) {
+                        //File not already on remote, upload file
+                        uploadFileToRemote(config, remotePath, localFile, md5hash, function (status) {
+                            if (!status || (status !== 200 && status !== 201)) {
+                                console.error(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') + ': ERROR: Failed to upload "' + localFile + '", response ' + status); 
+                            }
+                            else 
+                            {
+                                jfsdb.addUploadedFile(localFile, md5hash);
+                                if (callback)
+                                    callback();                       
+                            }
+                        });
+                    } else {
+                        console.error(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': ERROR: Unknown status ' + status);
+                        if (callback)
+                            callback("Error");
+                    }
+                });
+            }
+        });
     });
-
     // read all file and pipe it (write it) to the hash object
     fd.pipe(hash);
 }

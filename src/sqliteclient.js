@@ -5,51 +5,44 @@ var jfsdb = new sqlite3.Database(dbFile);
 
 module.exports = {    
     isFileUploaded: isFileUploaded,
-    addUploadedFile: addUploadedFile
+    addUploadedFile: addUploadedFile,
+    createDB: createDB
 };
 
-function isFileUploaded(filepath, md5hash) {
-    var create = false;
-    var exists = false;
-
+function createDB() {
     if (!fs.existsSync(dbFile)) {
-        create = true;
-    }
-    
-    return jfsdb.serialize(function() {
-        if(create) {
+        jfsdb.serialize(function() {
             jfsdb.run("CREATE TABLE jottafiles (filepath TEXT, md5hash TEXT)");
-        }
+        });
+     }
+}
 
-        return jfsdb.each("SELECT * from jottafiles where filepath='" + filepath + "'", function(err, row) {
-            if (row && row.md5hash === md5hash) {
-                return true;
-            }
-            return false;
+function isFileUploaded(filepath, md5hash, callback) {
+    jfsdb.serialize(function() {
+        jfsdb.all("select * from jottafiles where filepath='" + filepath + "'", function(err, rows) {
+            var exists = false;
+            
+            if (rows)
+                rows.forEach(function (row) {
+                    if (row && row.md5hash === md5hash) {
+                        exists = true;
+                    }
+                });
+            callback(exists);
         });
     });
 } 
 
 function addUploadedFile(filepath, md5hash) {
-    var create = false;
-    if (!fs.existsSync(dbFile)) {
-        create = true;
-    }
-
     jfsdb.serialize(function() {
-        if(create) {
-            jfsdb.run("CREATE TABLE jottafiles (filepath TEXT, md5hash TEXT)");
-        }
-
-        jfsdb.each("SELECT * from jottafiles where filepath='" + filepath + "'", function(err, row) {
-            if (row) {
+        jfsdb.each("SELECT * from jottafiles WHERE filepath='" + filepath + "'", function(err, row) {
+            if (row !== undefined) {
                 if (row.md5hash != md5hash) {
-                    jfsdb.run("UPDATE jottafiles SET md5hash='" + md5hash + "' where filepath='" + filepath + "'");
+                    jfsdb.run("DELETE FROM jottafiles WHERE filepath='" + filepath + "'");
                 }
-            } else {
-                jfsdb.run("insert into jottafiles(filepath, md5hash) values ('" + filepath + "', '" + md5hash + "')");
-            }
+            }             
         });
-    });
 
+        jfsdb.run("insert into jottafiles values ('" + filepath + "', '" + md5hash + "')");
+    });
 } 
