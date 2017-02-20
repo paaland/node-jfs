@@ -13,13 +13,16 @@ function createDB() {
     if (!fs.existsSync(dbFile)) {
         jfsdb.serialize(function() {
             jfsdb.run("CREATE TABLE jottafiles (filepath TEXT, md5hash TEXT)");
+            jfsdb.run("CREATE INDEX ix_jottafiles ON jottafiles (filepath)");
         });
      }
 }
 
 function isFileUploaded(filepath, md5hash, callback) {
     jfsdb.serialize(function() {
-        jfsdb.all("select * from jottafiles where filepath='" + filepath + "'", function(err, rows) {
+        var stmt = jfsdb.prepare("select * from jottafiles where filepath=?");
+        
+        stmt.all(filepath, function(err, rows) {
             var exists = false;
             
             if (rows)
@@ -28,21 +31,32 @@ function isFileUploaded(filepath, md5hash, callback) {
                         exists = true;
                     }
                 });
+
             callback(exists);
         });
+
+        stmt.finalize();
     });
 } 
 
 function addUploadedFile(filepath, md5hash) {
     jfsdb.serialize(function() {
-        jfsdb.each("SELECT * from jottafiles WHERE filepath='" + filepath + "'", function(err, row) {
+        var stmt = jfsdb.prepare("select * from jottafiles where filepath=?");
+
+        stmt.all(filepath, function(err, row) {
             if (row !== undefined) {
                 if (row.md5hash != md5hash) {
-                    jfsdb.run("DELETE FROM jottafiles WHERE filepath='" + filepath + "'");
+                    var delstmt = jfsdb.prepare("delete from jottafiles where filepath=?");
+                    delstmt.run(filepath);
+                    delstmt.finalize();
                 }
             }             
         });
 
-        jfsdb.run("insert into jottafiles values ('" + filepath + "', '" + md5hash + "')");
+        stmt.finalize();        
+
+        var insstmt = jfsdb.prepare("insert into jottafiles values(?,?)");
+        insstmt.run(filepath, md5hash);
+        insstmt.finalize();                
     });
 } 
