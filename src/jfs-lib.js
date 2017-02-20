@@ -15,7 +15,7 @@ module.exports = {
     setConfig : function (settings) {
         config = settings;
         if (config.syslogServer) {
-            syslogger.setConfig(config.syslogServer);
+            syslogger.setConfig(config.syslogServer, config.logLevel);
         }
     },
     list: list,

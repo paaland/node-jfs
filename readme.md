@@ -83,8 +83,8 @@ Limitations
 So README and readme will be the same file.
 * To download files or list files in folders that has a space either encapsulate in quotes or use a + character 
 ("device/Home Videos" or device/Home+Videos)
-* When uploading folders the client will calculate the MD5 hash for the file and query JottaCloud before uploading the file. Only new or changed files are uploaded.
 * This client cannot create new devices. You have to use an existing device when uploading to JottaCloud (first part of destination URL).
+* The first time a file is uploaded it's MD5 hash, last modified date and size is store in a sqlite3 database. On subsequent runs a file is only uploaded if modified date or size is changed.
 
 API documentation
 ==============

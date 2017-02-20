@@ -58,6 +58,7 @@ function getAllFilesInFolder(dir, ignore) {
 
 function uploadFolder (config, remotePath, localFolder, ignore, syslogger) {
     console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': Scanning ' + localFolder);
+    
     if (ignore[0])
         console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': Ignoring files matching: ' + ignore);
     
@@ -94,13 +95,13 @@ function uploadFolder (config, remotePath, localFolder, ignore, syslogger) {
     function error(err) {
         if (err) {
             console.error(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': ERROR: ' + err);
-            syslogger.logError('Error uploading ' + file + '. ' + e);
+            syslogger.logError('Error uploading file:' + err);
         }
     });
 }
     
-function uploadFile(config, remotePath, localFile, syslogger, callback)
-{    
+function calcMD5(localFile, callback)
+{
     // Calculate MD5 hash of file
     var fd = fs.createReadStream(localFile);
     var hash = crypto.createHash('md5');
@@ -108,17 +109,24 @@ function uploadFile(config, remotePath, localFile, syslogger, callback)
 
     fd.on('end', function() {
         hash.end();
-        var md5hash = hash.read(); 
-        
-        jfsdb.isFileUploaded(localFile, md5hash, function (exists) {
-            if (exists === true) {
-                console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': File "' + localFile + '" previously uploaded, skipping.');
-                syslogger.logDebug('File "' + localFile + '" previously uploaded, skipping.');
-                if (callback)
-                    callback();
-            }
-            else
-            {
+        callback(hash.read());
+    });
+    // read all file and pipe it (write it) to the hash object
+    fd.pipe(hash);
+}
+
+function uploadFile(config, remotePath, localFile, syslogger, callback) 
+{
+    jfsdb.isFileUploaded(localFile, function (exists) {
+        if (exists === true) {
+            console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': File "' + localFile + '" previously uploaded, skipping.');
+            syslogger.logDebug('File "' + localFile + '" previously uploaded, skipping.');
+            if (callback)
+                callback();
+        }
+        else
+        {
+            calcMD5(localFile, function (md5hash) {
                 checkIfFileExists(config, remotePath, localFile, md5hash, function (status) {
                     if (status === 200) {
                         console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': File "' + localFile + '" already exists, skipping.');
@@ -149,11 +157,9 @@ function uploadFile(config, remotePath, localFile, syslogger, callback)
                             callback("Error");
                     }
                 });
-            }
-        });
+            });
+        }
     });
-    // read all file and pipe it (write it) to the hash object
-    fd.pipe(hash);
 }
 
 function uploadFileToRemote(config, remotePath, localFile, md5hash, callback)

@@ -12,13 +12,14 @@ module.exports = {
 function createDB() {
     if (!fs.existsSync(dbFile)) {
         jfsdb.serialize(function() {
-            jfsdb.run("CREATE TABLE jottafiles (filepath TEXT, md5hash TEXT)");
+            jfsdb.run("CREATE TABLE jottafiles (filepath TEXT, md5hash TEXT, size INTERGER, modified INTEGER)");
             jfsdb.run("CREATE INDEX ix_jottafiles ON jottafiles (filepath)");
         });
      }
 }
 
-function isFileUploaded(filepath, md5hash, callback) {
+function isFileUploaded(filepath, callback) {
+
     jfsdb.serialize(function() {
         var stmt = jfsdb.prepare("select * from jottafiles where filepath=?");
         
@@ -27,8 +28,17 @@ function isFileUploaded(filepath, md5hash, callback) {
             
             if (rows)
                 rows.forEach(function (row) {
-                    if (row && row.md5hash === md5hash) {
-                        exists = true;
+                    if (row) {
+                        var stats = fs.statSync(filepath);        
+                        var size = stats.size;
+                        var modified = stats.mtime.getTime();
+                        // console.log("size: db=" +  row.size + ", file=" + size);
+                        // console.log("mod: db=" +  row.modified + ", file=" + modified);
+                        // console.log("md5: db=" +  row.md5hash + ", file=" + md5hash);
+                        // console.log("quick: " + quick);
+
+                        if (row.size == size && row.modified == modified) // && (quick || row.md5hash === md5hash))
+                            exists = true;
                     }
                 });
 
@@ -55,8 +65,13 @@ function addUploadedFile(filepath, md5hash) {
 
         stmt.finalize();        
 
-        var insstmt = jfsdb.prepare("insert into jottafiles values(?,?)");
-        insstmt.run(filepath, md5hash);
+        var stats = fs.statSync(filepath);        
+
+        var size = stats.size;
+        var modified = stats.mtime;
+
+        var insstmt = jfsdb.prepare("insert into jottafiles values(?,?,?,?)");
+        insstmt.run(filepath, md5hash, size, modified);
         insstmt.finalize();                
     });
 } 
