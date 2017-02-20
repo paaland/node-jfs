@@ -2,16 +2,21 @@ var request = require('request');
 var et = require('elementtree');
 var fs = require('fs');
 var prettyBytes = require('pretty-bytes');
+var dateformat = require('dateformat');
 var device = require('./device.js');
 var mountpoint = require('./mountpoint.js');
 var folder = require('./folder.js');
 var uploader = require('./jfsuploader.js');
+var syslogger = require('./syslogger.js');
 
 var config = {};
 
 module.exports = {
     setConfig : function (settings) {
         config = settings;
+        if (config.syslogServer) {
+            syslogger.setConfig(config.syslogServer);
+        }
     },
     list: list,
     listDevices: listDevices,
@@ -20,10 +25,12 @@ module.exports = {
     putFolder: putFolder
 }
 
+
 function putFolder(remotePath, localFolder, ignore) {
     if (!Array.isArray(ignore))
         ignore = Array(ignore);
-    uploader.uploadFolder(config, remotePath, localFolder, ignore);
+
+    uploader.uploadFolder(config, remotePath, localFolder, ignore, syslogger);
 }
 
 function putFile (remotePath, localFile) {

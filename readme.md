@@ -30,7 +30,8 @@ Create the file config.json and insert your username and password:
 
     {
         "username": "yourusername",
-        "password": "yourpassword" 
+        "password": "yourpassword",
+        "syslogServer": "optional syslog server" 
     }
 
 Syntax

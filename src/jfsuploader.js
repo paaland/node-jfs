@@ -56,7 +56,7 @@ function getAllFilesInFolder(dir, ignore) {
     return results;
 };
 
-function uploadFolder (config, remotePath, localFolder, ignore) {
+function uploadFolder (config, remotePath, localFolder, ignore, syslogger) {
     console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': Scanning ' + localFolder);
     if (ignore[0])
         console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': Ignoring files matching: ' + ignore);
@@ -68,7 +68,7 @@ function uploadFolder (config, remotePath, localFolder, ignore) {
     //TODO:
     //var filesInFolder = getRemoteFiles(remotePath);
     
-    async.eachLimit(files, 1, function(file, done) {
+    async.eachLimit(files, 2, function(file, done) {
         var fileName = path.basename(file);
         var folder = path.dirname(file);
         
@@ -78,23 +78,28 @@ function uploadFolder (config, remotePath, localFolder, ignore) {
         
         try
         {
-            uploadFile(config, remotePath + folder, file, function (err) {
-                if (err)
+            uploadFile(config, remotePath + folder, file, syslogger, function (err) {
+                if (err) {
                     done(err);
-                else 
+                }
+                else {
                     done();
+                }
             });
         } catch (e) {            
+            syslogger.logError('Error uploading ' + file + '. ' + e);
             done(e);
         }
     },
     function error(err) {
-        if (err)
+        if (err) {
             console.error(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': ERROR: ' + err);
+            syslogger.logError('Error uploading ' + file + '. ' + e);
+        }
     });
 }
     
-function uploadFile(config, remotePath, localFile, callback)
+function uploadFile(config, remotePath, localFile, syslogger, callback)
 {    
     // Calculate MD5 hash of file
     var fd = fs.createReadStream(localFile);
@@ -108,6 +113,7 @@ function uploadFile(config, remotePath, localFile, callback)
         jfsdb.isFileUploaded(localFile, md5hash, function (exists) {
             if (exists === true) {
                 console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': File "' + localFile + '" previously uploaded, skipping.');
+                syslogger.logDebug('File "' + localFile + '" previously uploaded, skipping.');
                 if (callback)
                     callback();
             }
@@ -116,6 +122,7 @@ function uploadFile(config, remotePath, localFile, callback)
                 checkIfFileExists(config, remotePath, localFile, md5hash, function (status) {
                     if (status === 200) {
                         console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': File "' + localFile + '" already exists, skipping.');
+                        syslogger.logDebug('File "' + localFile + '" already exists, skipping.');
                         jfsdb.addUploadedFile(localFile, md5hash);
                         
                         if (callback)
@@ -125,16 +132,19 @@ function uploadFile(config, remotePath, localFile, callback)
                         uploadFileToRemote(config, remotePath, localFile, md5hash, function (status) {
                             if (!status || (status !== 200 && status !== 201)) {
                                 console.error(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') + ': ERROR: Failed to upload "' + localFile + '", response ' + status); 
+                                syslogger.logError('Failed to upload  "' + localFile + '". StatusCode: ' + status);
                             }
                             else 
                             {
                                 jfsdb.addUploadedFile(localFile, md5hash);
+                                syslogger.logInfo('File "' + localFile + '" uploaded.');
                                 if (callback)
                                     callback();                       
                             }
                         });
                     } else {
                         console.error(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': ERROR: Unknown status ' + status);
+                        syslogger.logError('Failed to upload  "' + localFile + '". StatusCode: ' + status);
                         if (callback)
                             callback("Error");
                     }
