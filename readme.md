@@ -31,8 +31,15 @@ Create the file config.json and insert your username and password:
     {
         "username": "yourusername",
         "password": "yourpassword",
-        "syslogServer": "optional syslog server" 
+        "syslogServer": "localhost",
+        "logLevel": 3
     }
+
+The sysLogServer and logLevel are optional. Log levels available are:
+
+    3 Error
+    6 Informational 
+    7 Debug 
 
 Syntax
 -------------
