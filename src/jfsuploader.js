@@ -166,8 +166,12 @@ function uploadFileToRemote(config, remotePath, localFile, md5hash, callback)
 {
     var fileName = path.basename(localFile);
     var stats = fs.statSync(localFile);        
+
+    var url = encodeURI(config.username + '/' + remotePath + '/' +  fileName);
+    url = url.replace('#', '%23'); //encodeURI does not encode #
+
     var options = {
-        url: 'https://up.jottacloud.com/jfs/' + encodeURI(config.username + '/' + remotePath + '/' +  fileName) + '?umode=nomultipart',
+        url: 'https://up.jottacloud.com/jfs/' + url + '?umode=nomultipart',
         headers: {
             'User-Agent': 'node-jfs https://github.com/paaland/node-jfs',
             'JMd5': md5hash,
@@ -190,7 +194,7 @@ function uploadFileToRemote(config, remotePath, localFile, md5hash, callback)
                 callback(error.statusCode);                        
             })
             .on('response', function(response) {
-                console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') + ': Uploaded "' +  localFile + '"');
+                console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') + ': Uploaded "' +  localFile + '", ' + prettyBytes(stats.size));
                 callback(response.statusCode);
             })
         );

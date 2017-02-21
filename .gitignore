@@ -58,3 +58,5 @@ typings/
 .vscode
 
 config.json
+
+jottafiles.db
