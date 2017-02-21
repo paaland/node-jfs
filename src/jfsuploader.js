@@ -66,17 +66,17 @@ function uploadFolder (config, remotePath, localFolder, ignore, syslogger) {
 
     console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': Uploading ' + files.length + ' files');
 
-    //TODO:
-    //var filesInFolder = getRemoteFiles(remotePath);
-    
     async.eachLimit(files, 2, function(file, done) {
         var fileName = path.basename(file);
         var folder = path.dirname(file);
         
         //Remove initial path, convert to web url
         folder = folder.replace(localFolder, '');
-        folder = folder.replace('\\', '/');
-        
+        folder = folder.replace(/\\/g, '/');
+
+        if (!remotePath.endsWith('/'))
+            remotePath = remotePath + '/';
+
         try
         {
             uploadFile(config, remotePath + folder, file, syslogger, function (err) {
@@ -144,6 +144,7 @@ function uploadFile(config, remotePath, localFile, syslogger, callback)
                             }
                             else 
                             {
+                                console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') + ': Uploaded "' +  localFile + '"');
                                 jfsdb.addUploadedFile(localFile, md5hash);
                                 syslogger.logInfo('File "' + localFile + '" uploaded.');
                                 if (callback)
@@ -168,7 +169,7 @@ function uploadFileToRemote(config, remotePath, localFile, md5hash, callback)
     var stats = fs.statSync(localFile);        
 
     var url = encodeURI(config.username + '/' + remotePath + '/' +  fileName);
-    url = url.replace('#', '%23'); //encodeURI does not encode #
+    url = url.replace(/#/g, '%23'); //encodeURI does not encode #
 
     var options = {
         url: 'https://up.jottacloud.com/jfs/' + url + '?umode=nomultipart',
@@ -193,8 +194,7 @@ function uploadFileToRemote(config, remotePath, localFile, md5hash, callback)
                 console.error(error)
                 callback(error.statusCode);                        
             })
-            .on('response', function(response) {
-                console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') + ': Uploaded "' +  localFile + '", ' + prettyBytes(stats.size));
+            .on('response', function(response) {                
                 callback(response.statusCode);
             })
         );
