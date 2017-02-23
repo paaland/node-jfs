@@ -51,20 +51,10 @@ function isFileUploaded(filepath, callback) {
 
 function addUploadedFile(filepath, md5hash) {
     jfsdb.serialize(function() {
-        var stmt = jfsdb.prepare("select * from jottafiles where filepath=?");
-
-        stmt.all(filepath, function(err, row) {
-            if (row !== undefined) {
-                if (row.md5hash != md5hash) {
-                    var delstmt = jfsdb.prepare("delete from jottafiles where filepath=?");
-                    delstmt.run(filepath);
-                    delstmt.finalize();
-                }
-            }             
-        });
-
-        stmt.finalize();        
-
+        var delstmt = jfsdb.prepare("delete from jottafiles where filepath=?");
+        delstmt.run(filepath);
+        delstmt.finalize();
+ 
         var stats = fs.statSync(filepath);        
 
         var size = stats.size;

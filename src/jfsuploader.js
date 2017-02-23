@@ -129,7 +129,7 @@ function uploadFile(config, remotePath, localFile, syslogger, callback)
             calcMD5(localFile, function (md5hash) {
                 checkIfFileExists(config, remotePath, localFile, md5hash, function (status) {
                     if (status === 200) {
-                        console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': File "' + localFile + '" already exists, skipping.');
+                        console.log(dateformat(new Date(), 'dd.mm.yyyy HH:MM:ss') +': File "' + localFile + '" already exists remote, not re-uploading.');
                         syslogger.logDebug('File "' + localFile + '" already exists, skipping.');
                         jfsdb.addUploadedFile(localFile, md5hash);
                         
