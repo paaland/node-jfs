@@ -1,6 +1,6 @@
 {
   "name": "node-jfs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Jottacloud File System (JFS) client in NodeJS",
   "main": "jfs.js",
   "directories": {
