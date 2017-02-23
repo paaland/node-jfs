@@ -3,13 +3,25 @@
   "version": "1.0.0",
   "description": "Jottacloud File System (JFS) client in NodeJS",
   "main": "jfs.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "directories": {
+    "bin": "./bin"
+  },
+  "bin": {
+    "jfs": "jfs.js"
+  },
+  "runtime": {
+    "framework": "node",
+    "version": "6.9.2",
+    "ignoreFlags": true
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/paaland/node-jfs.git"
   },
+  "bugs": {
+    "url": "https://github.com/paaland/node-jfs/issues"
+  },
+  "homepage": "https://github.com/paaland/node-jfs/#readme",
   "author": "Pål Andreassen",
   "license": "MIT",
   "dependencies": {
